@@ -22,7 +22,9 @@ class Labirinto:
             self._tam_celula = tam_celula
 
         self._turtle = Turtle() # A tartaruga que desenha o caminho do labirinto
-        self._turtle.hideturtle() # Esconde a tartaruga
+        self._turtle2 = Turtle() # A tartaruga que desenha as divisórias das ruas
+        self._turtle.hideturtle() # Esconde a primeira tartaruga
+        self._turtle2.hideturtle() # Esconde a segunda tartaruga
 
         # Código novo
         self.agentes = {}
@@ -90,11 +92,20 @@ class Labirinto:
 
     def desenhar_divisoria(self, celula, cor):
         x, y = celula.coord_turt_centralizada()
-        self._turtle.up()
-        self._turtle.goto(x, y)
-        self._turtle.down()
-        self._turtle.pencolor(cor)
-        self._turtle.forward(6)
+        a, b = celula.coord_matriz()
+        if self.horizontal(a, b):
+            self._turtle2.up()
+            self._turtle2.goto(x, y)
+            self._turtle2.down()
+            self._turtle2.pencolor(cor)
+            self._turtle2.forward(6)
+        elif self.vertical(a, b):
+            self._turtle2.up()
+            self._turtle2.goto(x, y)
+            self._turtle2.down()
+            self._turtle2.pencolor(cor)
+            self._turtle2.left(90)
+            self._turtle2.forward(6)
 
     def eh_caminho(self, lin, col):
         """ Dada uma matriz quadrada, retorna True quando (lin, col) == 1 e
@@ -109,6 +120,30 @@ class Labirinto:
         return lin >= 0 and col >= 0 and                    \
                lin < self._dim and col < self._dim and      \
                self._matriz[lin][col] == 1
+
+    def nao_eh_caminho(self, lin, col):
+        return lin >= 0 and col >= 0 and \
+               lin < self._dim and col < self._dim and \
+               self._matriz[lin][col] == 0
+
+    def horizontal(self, lin, col):
+        return lin >= 0 and col >= 0 and \
+               lin < self._dim and col < self._dim and \
+               self._matriz[lin][col] == 1 and \
+               self.eh_caminho(lin, col - 1) and \
+               self.eh_caminho(lin, col + 1) and \
+               self.nao_eh_caminho(lin + 1, col) and \
+               self.nao_eh_caminho(lin - 1, col)
+
+
+    def vertical(self, lin, col):
+        return lin >= 0 and col >= 0 and \
+               lin < self._dim and col < self._dim and \
+               self._matriz[lin][col] == 1 and \
+               self.eh_caminho(lin + 1, col) and \
+               self.eh_caminho(lin + 1, col) and \
+               self.nao_eh_caminho(lin, col - 1) and \
+               self.nao_eh_caminho(lin, col + 1)
 
     def desenhar_celula(self, celula, cor):
         """ Dada uma coordenada (x, y) do Turtle, desenha um quadrado (célula) na posição """
@@ -158,16 +193,22 @@ class Labirinto:
     def add_fantasma(self, id):
         """ Adiciona um fantasma ao labirinto """
         tam_agente = self._tam_celula
-        f = Agente(id, tam_agente, 'red')
+        f = Agente(id, tam_agente, 'blue')
         f.add_labirinto(self)
         self.agentes[id] = f
         return f
 
-    def eh_celula_ocupada(self, celula, agente_id):
+    def eh_celula_ocupada(self, prox_pos_agente: tuple, agente_id):
         """ Verifica se uma celula tem algum agente diferente do agente_id """
         # REQ
         # Deve verificar no dicionário de agentes se a célula do parâmetro está
         # sendo ocupada por algum agente
+        for id in self.agentes.keys():
+
+            if id != agente_id and self.agentes[id]._posicao.coord_matriz() == prox_pos_agente:
+
+                return True
+
         return False
 
     def dist_manhattan(self, origem, destino):

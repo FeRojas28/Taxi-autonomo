@@ -8,16 +8,16 @@ from time import sleep
 
 def main():
     # Simulação 1
-    # um_agente_percorre_tudo()
+    #um_agente_percorre_tudo()
 
     # Simulação 2
-    #um_agente_vagueia()
+    um_agente_vagueia()
 
     # Simulação 3
     #todos_vagueiam()
 
     # Simulação 4
-    agente_com_um_destino()
+    #agente_com_um_destino()
 
     done()
 
@@ -32,7 +32,7 @@ def um_agente_percorre_tudo():
     id = 0
     agente = lab.add_pacman(id)
 
-    intervalo_entre_frames = 0.1
+    intervalo_entre_frames = 0.01
 
     chegou_ao_fim = False
     while (not chegou_ao_fim):

@@ -90,27 +90,20 @@ class Agente:
         """ Vaguear significa continuar andando na mesma direção até que se
             encontre um obstáculo, quando se muda a direção aleatoriamente
         """
-        lab = self.labirinto
-        # REQ
-        # Deve obter o passo (sem efetivamente dar o passo)
+        lab = self._labirinto
         passo = self.prox_passo()
-        prox_pos_agente = None
-        # REQ
-        # Deve verificar:
-        # Se der o passo, continua sendo caminho (lab.eh_caminho())
+        lin_p, col_p = passo
+        alin, acol = self._posicao.coord_turtle()
+        prox_pos_agente = lab.criar_celula(coord_turt=(alin + lin_p, acol + col_p))
+        lin, col = prox_pos_agente.coord_matriz()
+        id_ = self._id
+        if lab.eh_caminho(lin,col) and not(lab.eh_celula_ocupada((lin,col), id_)):
+            self._posicao = prox_pos_agente
+        else:
+            prox_pos_agente = self._posicao
+            self.direcao = self.mudar_direcao_aleatoriamente()
 
-        # REQ
-        # Deve verificar:
-        # Se der o passo, a posição estará ocupada? (lab.eh_celula_ocupada())
-
-        # REQ
-        # Definir qual é a próxima posição do agente
-        # Caso a posição não esteja ocupada ocupada e nem seja caminho:
-        # Muda o agente para a posição do novo passo
-        # Caso contrário
-        # Escolhe a nova direção aleatoriamente
-
-        self.pos = prox_pos_agente
+        #self.posicao = prox_pos_agente
         # Desenhar a posição na tela
         self.desenhar_se()
         return
@@ -126,7 +119,10 @@ class Agente:
     def mudar_direcao_aleatoriamente(self):
         """ Escolhe alguma direção aleatoriamente que não seja a atual """
         # REQ implementar o método
-        pass
+        passo = [vector(1,0),vector(-1,0),vector(0,1),vector(0,-1)]
+        random = choice(passo)
+
+        return random
 
     """
     ROTA
