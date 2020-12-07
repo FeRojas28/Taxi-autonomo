@@ -3,6 +3,7 @@
 
 from turtle import *
 from percursos import Waze
+from celula import Celula
 
 # add as seguintes bibliotecas
 from utils import vector
@@ -20,12 +21,13 @@ class Agente:
         self._turtle = Turtle()
         self._turtle.hideturtle()
 
-        # define a cor do agente
-        self._cor = cor
-        # REQ
-        # deve definir a cor do agente aleatoriamente (verde, vermelho, rosa, laranja e marrom)
-        # se não for passado no construtor
-        # é um gerador de percursos
+        # define a cor do agente aleatoriamente
+        cores = ['green', 'red', 'pink', 'orange', 'brown']
+        aleatório = choice(cores)
+
+        # escolhendo a cor
+        self._cor = cor # cores padrões
+        #self._cor = aleatório
 
         self._waze = None
 
@@ -48,18 +50,23 @@ class Agente:
 
     # Note que o nome do método mudou um pouco
     def desenhar_se(self, posicao=None):
-        """ Leva a tartaruga até a posição (x,y) e desenha por exemplo um círculo
-            para representar o agente (i.e., pacman, fantasmas)
+        """ Leva a tartaruga até a posição (x,y) e desenha um mini-quadrado
+            para representar o agente (i.e., táxi, outros veículos)
         """
         self._turtle.clear()
         if (not posicao):
             posicao = self._posicao
 
         x, y = posicao.coord_turt_centralizada()
+        self._turtle.color(self._cor)
         self._turtle.up()
-        self._turtle.goto(x , y)
+        self._turtle.goto(x,y)
         self._turtle.down()
-        self._turtle.dot(self._tam_agente, self._cor)
+        self._turtle.begin_fill()
+        for _ in range(4):
+            self._turtle.forward(9)
+            self._turtle.left(90)
+        self._turtle.end_fill()
 
     """ Métodos de percurso """
 

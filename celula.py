@@ -66,6 +66,12 @@ class Celula:
         chao_y = int(floor(y, self._tam_celula))
         return chao_x, chao_y
 
+    def posicao_na_celula(self, coord_turt):
+        x, y = coord_turt
+        posicao_x = int(floor(x, self._tam_celula) + x//4)
+        posicao_y = int(floor(y, self._tam_celula) + x//4)
+        return posicao_x, posicao_y
+
     def coord_turt_centralizada(self):
         """ Retorna uma coordenada Turtle centralizada na célula """
         x, y = self.coord_turtle()

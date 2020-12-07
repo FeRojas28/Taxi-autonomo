@@ -22,9 +22,7 @@ class Labirinto:
             self._tam_celula = tam_celula
 
         self._turtle = Turtle() # A tartaruga que desenha o caminho do labirinto
-        self._turtle2 = Turtle() # A tartaruga que desenha as divisórias das ruas
         self._turtle.hideturtle() # Esconde a primeira tartaruga
-        self._turtle2.hideturtle() # Esconde a segunda tartaruga
 
         # Código novo
         self.agentes = {}
@@ -40,7 +38,8 @@ class Labirinto:
     def criar_matriz(self, dimensao):
         """ Cria uma matriz """
         #self._matriz = Matriz().aleatoria(dimensao)
-        self._matriz = Matriz().ler_fixa()
+        #self._matriz = Matriz().ler_fixa()
+        self._matriz = Matriz().carregar_de('C:/Users/felip/Downloads/matr.txt')
 
     def criar_tela(self, p1=420, p2=420, p3=370, p4=0):
         """ Cria uma tela do Turtle """
@@ -65,11 +64,14 @@ class Labirinto:
                     # Numa coordenada da matriz (lin, col), o primeiro elemento é a linha e o segundo a coluna
 
                     celula = self.criar_celula(coord_matr=(lin, col))
+
                     # Pinta a celula na posição (x,y) com a cor especificada
                     self.desenhar_celula(celula, 'black')
 
-                    #self.desenhar_pastilha(celula, 'yellow')
-                    self.desenhar_divisoria(celula, 'yellow')
+                    # Desenha as divisórias nas células já desenhadas
+                    self.desenhar_divisoria_horizontal(celula, 'yellow')
+                    self.desenhar_divisoria_vertical(celula, 'yellow')
+
 
     def cel_aleatoria(self):
         """ Retorna os índices de uma posição que seja caminho
@@ -80,70 +82,34 @@ class Labirinto:
 
         return self.criar_celula(coord_matr=(i,j))
 
-    def desenhar_pastilha(self, celula, cor):
-        """ Leva a tartaruga até a posição (x,y) e desenha por exemplo um círculo
-            para representar a pastilha
-        """
-        x, y = celula.coord_turt_centralizada()
-        self._turtle.up()
-        self._turtle.goto(x, y)
-        self._turtle.down()
-        self._turtle.dot(3, cor)
-
-    def desenhar_divisoria(self, celula, cor):
-        x, y = celula.coord_turt_centralizada()
-        a, b = celula.coord_matriz()
-        if self.horizontal(a, b):
-            self._turtle2.up()
-            self._turtle2.goto(x, y)
-            self._turtle2.down()
-            self._turtle2.pencolor(cor)
-            self._turtle2.forward(6)
-        elif self.vertical(a, b):
-            self._turtle2.up()
-            self._turtle2.goto(x, y)
-            self._turtle2.down()
-            self._turtle2.pencolor(cor)
-            self._turtle2.left(90)
-            self._turtle2.forward(6)
 
     def eh_caminho(self, lin, col):
-        """ Dada uma matriz quadrada, retorna True quando (lin, col) == 1 e
+        """ Dada uma matriz quadrada, retorna True quando (lin, col) == 1, 2 ou 3 e
             False caso contrário.
             Por exemplo, na matriz a seguir:
             [[ 1  0  0 ]
-             [ 0  1  0 ]
-             [ 0  0  1 ]]
+             [ 0  2  0 ]
+             [ 0  0  3 ]]
             a chamada de função 'eh_caminho(0,0)' retorna True e
             a chamada de função 'eh_caminho(0,1)' retorna False
         """
         return lin >= 0 and col >= 0 and                    \
                lin < self._dim and col < self._dim and      \
-               self._matriz[lin][col] == 1
-
-    def nao_eh_caminho(self, lin, col):
-        return lin >= 0 and col >= 0 and \
-               lin < self._dim and col < self._dim and \
-               self._matriz[lin][col] == 0
+               self._matriz[lin][col] == 1 or \
+               self._matriz[lin][col] == 2 or \
+               self._matriz[lin][col] == 3
 
     def horizontal(self, lin, col):
+        """ Retorna True ou False: pré-determinamos o número 1 para células horizontais """
         return lin >= 0 and col >= 0 and \
                lin < self._dim and col < self._dim and \
-               self._matriz[lin][col] == 1 and \
-               self.eh_caminho(lin, col - 1) and \
-               self.eh_caminho(lin, col + 1) and \
-               self.nao_eh_caminho(lin + 1, col) and \
-               self.nao_eh_caminho(lin - 1, col)
-
+               self._matriz[lin][col] == 1
 
     def vertical(self, lin, col):
+        """ Retorna True ou False: pré-determinamos o número 2 para células verticais """
         return lin >= 0 and col >= 0 and \
                lin < self._dim and col < self._dim and \
-               self._matriz[lin][col] == 1 and \
-               self.eh_caminho(lin + 1, col) and \
-               self.eh_caminho(lin + 1, col) and \
-               self.nao_eh_caminho(lin, col - 1) and \
-               self.nao_eh_caminho(lin, col + 1)
+               self._matriz[lin][col] == 2
 
     def desenhar_celula(self, celula, cor):
         """ Dada uma coordenada (x, y) do Turtle, desenha um quadrado (célula) na posição """
@@ -158,6 +124,30 @@ class Labirinto:
             self._turtle.left(90)
         self._turtle.end_fill()
         self._turtle.up()
+
+    def desenhar_divisoria_horizontal(self, celula, cor):
+        """ Desenha divisórias nas células pré-determinadas horizontais """
+        x, y = celula.coord_turt_centralizada()
+        a, b = celula.coord_matriz()
+        if self.horizontal(a, b):
+            self._turtle.up()
+            self._turtle.goto(x, y)
+            self._turtle.down()
+            self._turtle.pencolor(cor)
+            self._turtle.forward(6)
+
+    def desenhar_divisoria_vertical(self, celula, cor):
+        """ Desenha divisórias nas células pré-determinadas verticais """
+        x, y = celula.coord_turt_centralizada()
+        a, b = celula.coord_matriz()
+        if self.vertical(a, b):
+            self._turtle.up()
+            self._turtle.goto(x, y)
+            self._turtle.down()
+            self._turtle.pencolor(cor)
+            self._turtle.left(90)
+            self._turtle.forward(6)
+            self._turtle.right(90)
 
     def obter_vizinhos(self, celula):
         """ Retorna os vizinhos de uma celula """
